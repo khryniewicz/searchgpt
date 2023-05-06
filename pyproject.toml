@@ -9,6 +9,7 @@ readme = "README.md"
 google-search-results = "^2.4.2"
 gradio = "^3.28.3"
 langchain = "^0.0.161"
+openai = "^0.27.6"
 python = "^3.11"
 python-dotenv = "^1.0.0"
 
