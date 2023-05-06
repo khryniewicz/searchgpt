@@ -1,9 +1,5 @@
 import gradio as gr
-
-
-def respond(message, history):
-    history.append((message, str.upper(message)))
-    return "", history
+from searchgpt.pirate_search import respond
 
 
 with gr.Blocks(title="SearchGPT") as demo:
