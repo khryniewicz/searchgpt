@@ -1,5 +1,5 @@
 import gradio as gr
-from searchgpt.pirate_search import respond
+from searchgpt.llm import respond
 
 
 with gr.Blocks(title="SearchGPT") as demo:
