@@ -6,6 +6,7 @@ authors = ["Kamil Hryniewicz <kamil.hryniewicz@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
+gradio = "^3.28.3"
 python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
