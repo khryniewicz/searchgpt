@@ -2561,6 +2561,17 @@ files = [
 ]
 
 [[package]]
+name = "wget"
+version = "3.2"
+description = "pure python download utility"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "wget-3.2.zip", hash = "sha256:35e630eca2aa50ce998b9b1a127bb26b30dfee573702782aa982f875e3f16061"},
+]
+
+[[package]]
 name = "wrapt"
 version = "1.15.0"
 description = "Module for decorators, wrappers and monkey patching."
@@ -2736,4 +2747,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a3ba4ed274abe62fd36cfa79831d0ab076c3c2cc8d8786b21bd6b6d621459663"
+content-hash = "f02fc959064e1556a7aa29ee10ad2e9fbf594c37c593cfa8ca6e15b9091694fc"
