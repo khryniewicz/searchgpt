@@ -4,6 +4,7 @@ from langchain import LLMChain, SerpAPIWrapper
 from langchain.agents import AgentExecutor, AgentOutputParser, LLMSingleActionAgent
 from langchain.agents import Tool
 from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import BaseChatPromptTemplate
 from langchain.schema import AgentAction, AgentFinish, HumanMessage
 
@@ -41,7 +42,9 @@ class CustomOutputParser(AgentOutputParser):
         return AgentAction(tool=action, tool_input=action_input, log=text)
 
 
-TEMPLATE = """Answer the following questions as best you can, but speaking as a pirate.
+TEMPLATE = """You are SearchGPT, a professional search engine.
+You provide informative answers to users.
+Answer the following questions as best you can.
 You have access to the following tools:
 
 {tools}
@@ -57,11 +60,13 @@ Observation: the result of the action
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
 
-Begin! Remember to speak as a pirate when giving your final answer. Use lots of "Arg"s
+Begin! Remember to give detailed, informative answers
 
-Question: {input}
+Previous conversation history:
+{history}
+
+New question: {input}
 {agent_scratchpad}"""
-
 search = SerpAPIWrapper()
 search_tool = Tool(
     name="Search",
@@ -73,7 +78,7 @@ tools = [search_tool]
 prompt = CustomPromptTemplate(
     template=TEMPLATE,
     tools=tools,
-    input_variables=["input", "intermediate_steps"],
+    input_variables=["input", "intermediate_steps", "history"],
 )
 
 agent = LLMSingleActionAgent(
@@ -82,7 +87,9 @@ agent = LLMSingleActionAgent(
     stop=["\nObservation:"],
     allowed_tools=[tool.name for tool in tools],
 )
-agent_executor = AgentExecutor.from_agent_and_tools(agent, tools, verbose=True)
+agent_executor = AgentExecutor.from_agent_and_tools(
+    agent, tools, memory=ConversationBufferWindowMemory(k=2), verbose=True
+)
 
 
 def respond(message, history):
