@@ -30,20 +30,15 @@ class CustomPromptTemplate(BaseChatPromptTemplate):
 class CustomOutputParser(AgentOutputParser):
     def parse(self, text: str) -> Union[AgentAction, AgentFinish]:
         if "Final Answer:" in text:
-            return AgentFinish(
-                return_values={"output": text.split("Final Answer:")[-1].strip()},
-                log=text,
-            )
+            answer = text.split("Final Answer:")[-1].strip()
+            return AgentFinish(return_values={"output": answer}, log=text)
         regex = r"Action: (.*?)[\n]*Action Input:[\s]*(.*)"
         match = re.search(regex, text, re.DOTALL)
         if not match:
             raise ValueError(f"Could not parse LLM output: `{text}`")
         action = match.group(1).strip()
-        action_input = match.group(2)
-
-        return AgentAction(
-            tool=action, tool_input=action_input.strip(" ").strip('"'), log=text
-        )
+        action_input = match.group(2).strip(" ").strip('"')
+        return AgentAction(tool=action, tool_input=action_input, log=text)
 
 
 TEMPLATE = """Answer the following questions as best you can, but speaking as a pirate.
