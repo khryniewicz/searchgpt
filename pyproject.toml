@@ -6,6 +6,7 @@ authors = ["Kamil Hryniewicz <kamil.hryniewicz@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
+google-search-results = "^2.4.2"
 gradio = "^3.28.3"
 langchain = "^0.0.161"
 python = "^3.11"

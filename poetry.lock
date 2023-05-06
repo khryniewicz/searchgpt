@@ -729,6 +729,20 @@ ssh = ["paramiko"]
 tqdm = ["tqdm"]
 
 [[package]]
+name = "google-search-results"
+version = "2.4.2"
+description = "Scrape and search localized results from Google, Bing, Baidu, Yahoo, Yandex, Ebay, Homedepot, youtube at scale using SerpApi.com"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "google_search_results-2.4.2.tar.gz", hash = "sha256:603a30ecae2af8e600b22635757a6df275dad4b934f975e67878ccd640b78245"},
+]
+
+[package.dependencies]
+requests = "*"
+
+[[package]]
 name = "gradio"
 version = "3.28.3"
 description = "Python library for easily interacting with trained machine learning models"
@@ -2699,4 +2713,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "787ebe9b2b50ae5b8ce6834473e1e411390537aab08defddfb712c9f67921ea0"
+content-hash = "a82d8b29fb69c0212f25228c86fcb30e1d4d7d1c02609d7dfa30c581a9a436b5"
