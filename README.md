@@ -4,8 +4,7 @@ SearchGPT is a tool-using agent that utilizes the power of GPT-3.5 to provide se
 
 ## Usage
 
-You need to obtain API keys and put them into `.env` file
-
+You need to obtain API keys and put them into `.env` file:
 ```
 OPENAI_API_KEY=sk-***
 PINECONE_API_KEY=***
@@ -13,8 +12,12 @@ PINECONE_ENVIRONMENT=northamerica-northeast1-gcp
 SERPAPI_API_KEY=***
 ```
 
-To start the SearchGPT interface, run the following command:
+To download and process podcasts run:
+```sh
+python scripts/pinecone_podcasts.py
+```
 
+After that to start the SearchGPT interface, run the following command:
 ```sh
 gradio searchgpt
 ```
