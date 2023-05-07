@@ -1,12 +1,15 @@
 from typing import List, Union
 import re
-from langchain import LLMChain, SerpAPIWrapper
+from langchain import OpenAI, LLMChain, SerpAPIWrapper
 from langchain.agents import AgentExecutor, AgentOutputParser, LLMSingleActionAgent
 from langchain.agents import Tool
+from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import BaseChatPromptTemplate
 from langchain.schema import AgentAction, AgentFinish, HumanMessage
+from langchain.vectorstores import Pinecone
 
 
 class CustomPromptTemplate(BaseChatPromptTemplate):
@@ -67,13 +70,29 @@ Previous conversation history:
 
 New question: {input}
 {agent_scratchpad}"""
+
 search = SerpAPIWrapper()
 search_tool = Tool(
     name="Search",
     func=search.run,
-    description="useful for when you need to answer questions about current events",
+    description="Useful for when you need to answer questions about current events.",
 )
-tools = [search_tool]
+
+embeddings = OpenAIEmbeddings()
+docsearch = Pinecone.from_existing_index("podcasts", embeddings, text_key="text_chunk")
+podcast_retriever = RetrievalQA.from_chain_type(
+    llm=OpenAI(temperature=0), chain_type="stuff", retriever=docsearch.as_retriever()
+)
+knowledge_base_tool = Tool(
+    name="Knowledge Base",
+    func=podcast_retriever.run,
+    description=(
+        "Useful for general questions about how to do things and for details on "
+        "interesting topics. Input should be a fully formed question."
+    ),
+)
+
+tools = [knowledge_base_tool, search_tool]
 
 prompt = CustomPromptTemplate(
     template=TEMPLATE,
