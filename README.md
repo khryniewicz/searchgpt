@@ -8,6 +8,8 @@ You need to obtain API keys and put them into `.env` file
 
 ```
 OPENAI_API_KEY=sk-***
+PINECONE_API_KEY=***
+PINECONE_ENVIRONMENT=northamerica-northeast1-gcp
 SERPAPI_API_KEY=***
 ```
 
