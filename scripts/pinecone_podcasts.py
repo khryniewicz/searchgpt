@@ -4,12 +4,14 @@ import json
 import os
 import zipfile
 
+from dotenv import load_dotenv
 import pinecone
 from tqdm.auto import tqdm
 import wget
 
 
 print("Init Pinecone")
+load_dotenv()
 pinecone_env = os.getenv("PINECONE_ENVIRONMENT")
 pinecone.init(os.getenv("PINECONE_API_KEY"), environment=pinecone_env)
 print(f"Pinecone: {pinecone.whoami()}")
