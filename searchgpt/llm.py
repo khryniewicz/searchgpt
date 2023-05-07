@@ -106,11 +106,10 @@ agent = LLMSingleActionAgent(
     stop=["\nObservation:"],
     allowed_tools=[tool.name for tool in tools],
 )
-agent_executor = AgentExecutor.from_agent_and_tools(
-    agent, tools, memory=ConversationBufferWindowMemory(k=2), verbose=True
-)
+memory = ConversationBufferWindowMemory(k=2)
+executor = AgentExecutor.from_agent_and_tools(agent, tools, memory=memory, verbose=True)
 
 
 def respond(message, history):
-    history.append((message, agent_executor.run(message)))
+    history.append((message, executor.run(message)))
     return "", history
