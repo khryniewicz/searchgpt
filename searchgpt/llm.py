@@ -1,5 +1,5 @@
-from typing import List, Union
 import re
+from typing import List, Union
 from langchain import OpenAI, LLMChain, SerpAPIWrapper
 from langchain.agents import AgentExecutor, AgentOutputParser, LLMSingleActionAgent
 from langchain.agents import Tool
@@ -80,12 +80,10 @@ search_tool = Tool(
 
 embeddings = OpenAIEmbeddings()
 docsearch = Pinecone.from_existing_index("podcasts", embeddings, text_key="text_chunk")
-podcast_retriever = RetrievalQA.from_chain_type(
-    llm=OpenAI(temperature=0), chain_type="stuff", retriever=docsearch.as_retriever()
-)
+podcasts_qa = RetrievalQA.from_chain_type(OpenAI(), retriever=docsearch.as_retriever())
 knowledge_base_tool = Tool(
     name="Knowledge Base",
-    func=podcast_retriever.run,
+    func=podcasts_qa.run,
     description=(
         "Useful for general questions about how to do things and for details on "
         "interesting topics. Input should be a fully formed question."
