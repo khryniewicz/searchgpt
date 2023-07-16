@@ -1,5 +1,5 @@
 import re
-from typing import List, Union
+from typing import Union
 from langchain import OpenAI, LLMChain, SerpAPIWrapper
 from langchain.agents import AgentExecutor, AgentOutputParser, LLMSingleActionAgent
 from langchain.agents import Tool
@@ -14,21 +14,13 @@ from langchain.vectorstores import Pinecone
 
 class CustomPromptTemplate(BaseChatPromptTemplate):
     template: str
-    tools: List[Tool]
 
     def format_messages(self, **kwargs) -> str:
-        intermediate_steps = kwargs.pop("intermediate_steps")
-        thoughts = ""
-        for action, observation in intermediate_steps:
-            thoughts += action.log
-            thoughts += f"\nObservation: {observation}\nThought: "
-        kwargs["agent_scratchpad"] = thoughts
-        kwargs["tools"] = "\n".join(
-            [f"{tool.name}: {tool.description}" for tool in self.tools]
+        kwargs["agent_scratchpad"] = "".join(
+            f"{action.log}\nObservation: {observation}\nThought: "
+            for action, observation in kwargs.pop("intermediate_steps")
         )
-        kwargs["tool_names"] = ", ".join([tool.name for tool in self.tools])
-        formatted = self.template.format(**kwargs)
-        return [HumanMessage(content=formatted)]
+        return [HumanMessage(content=self.template.format(**kwargs))]
 
 
 class CustomOutputParser(AgentOutputParser):
@@ -84,20 +76,21 @@ podcasts_qa = RetrievalQA.from_chain_type(OpenAI(), retriever=docsearch.as_retri
 knowledge_base_tool = Tool(
     name="Knowledge Base",
     func=podcasts_qa.run,
-    description=(
-        "Useful for general questions about how to do things and for details on "
-        "interesting topics. Input should be a fully formed question."
-    ),
+    description="How to do things; details on interesting topics. Input as a question.",
 )
 
 tools = [knowledge_base_tool, search_tool]
-
+TEMPLATE = TEMPLATE.format(
+    tools="\n".join(f"{t.name}: {t.description}" for t in tools),
+    tool_names=", ".join(tool.name for tool in tools),
+    input="{input}",
+    history="{history}",
+    agent_scratchpad="{agent_scratchpad}",
+)
 prompt = CustomPromptTemplate(
     template=TEMPLATE,
-    tools=tools,
     input_variables=["input", "intermediate_steps", "history"],
 )
-
 agent = LLMSingleActionAgent(
     llm_chain=LLMChain(llm=ChatOpenAI(temperature=0), prompt=prompt),
     output_parser=CustomOutputParser(),
