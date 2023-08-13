@@ -28,8 +28,7 @@ class CustomOutputParser(AgentOutputParser):
         if "Final Answer:" in text:
             answer = text.split("Final Answer:")[-1].strip()
             return AgentFinish(return_values={"output": answer}, log=text)
-        regex = r"Action: (.*?)[\n]*Action Input:[\s]*(.*)"
-        match = re.search(regex, text, re.DOTALL)
+        match = re.search(r"Action: (.*?)[\n]*Action Input:[\s]*(.*)", text, re.DOTALL)
         if not match:
             raise ValueError(f"Could not parse LLM output: `{text}`")
         action = match.group(1).strip()
@@ -41,7 +40,6 @@ TEMPLATE = """You are SearchGPT, a professional search engine.
 You provide informative answers to users.
 Answer the following questions as best you can.
 You have access to the following tools:
-
 {tools}
 
 Use the following format:
@@ -58,10 +56,10 @@ Final Answer: the final answer to the original input question
 Begin! Remember to give detailed, informative answers
 
 Previous conversation history:
-{history}
+{{history}}
 
-New question: {input}
-{agent_scratchpad}"""
+Question: {{input}}
+{{agent_scratchpad}}"""
 
 search = SerpAPIWrapper()
 search_tool = Tool(
@@ -81,11 +79,8 @@ knowledge_base_tool = Tool(
 
 tools = [knowledge_base_tool, search_tool]
 TEMPLATE = TEMPLATE.format(
-    tools="\n".join(f"{t.name}: {t.description}" for t in tools),
+    tools="\n".join(f"{tool.name}: {tool.description}" for tool in tools),
     tool_names=", ".join(tool.name for tool in tools),
-    input="{input}",
-    history="{history}",
-    agent_scratchpad="{agent_scratchpad}",
 )
 prompt = CustomPromptTemplate(
     template=TEMPLATE,
@@ -101,6 +96,6 @@ memory = ConversationBufferWindowMemory(k=2)
 executor = AgentExecutor.from_agent_and_tools(agent, tools, memory=memory, verbose=True)
 
 
-def respond(message, history):
+def respond(message: str, history: list) -> tuple[str, list]:
     history.append((message, executor.run(message)))
     return "", history
